@@ -11,7 +11,7 @@ on:
 #    branches: [ "develop" ]
   # Allows you to run this workflow manually from the Actions tab
 #  workflow_dispatch:
-
+environment: common
 env:
   ACR_SERVER: ${{ vars.ACR_SERVER }}
   APP_NAME: notification
