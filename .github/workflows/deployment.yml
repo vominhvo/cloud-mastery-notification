@@ -11,7 +11,7 @@ on:
 #    branches: [ "develop" ]
   # Allows you to run this workflow manually from the Actions tab
 #  workflow_dispatch:
-environment: common
+
 env:
   ACR_SERVER: ${{ vars.ACR_SERVER }}
   APP_NAME: notification
@@ -20,7 +20,7 @@ env:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
-  build:
+  microservices-build:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
@@ -49,10 +49,12 @@ jobs:
 
       - name: Debug
         run: ls -la
-  push:
+
+  microservices-push:
     # Run after 'build' stage completed
     needs: build
     runs-on: ubuntu-latest
+    environment: common
     outputs:
       version: ${{ steps.imageTagGeneration.outputs.version }}
     steps:
