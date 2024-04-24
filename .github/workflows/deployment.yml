@@ -68,7 +68,7 @@ jobs:
       - name: Generate latest image tag
         id: imageTagGeneration
         shell: bash
-        run: echo "::set-output name=version::`date +%Y%m%d%H%M%S`.${GITHUB_REF##*/}.${GITHUB_SHA:0:7}"
+        run: echo "::set-output name=version::${GITHUB_REF##*/}-${GITHUB_SHA:0:7}"
 
       - name: Login to ACR
         uses: azure/docker-login@v1
