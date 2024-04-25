@@ -99,7 +99,7 @@ jobs:
           context: '.'
 
   deploy:
-    needs: push
+    needs: containerize
     if: github.ref == 'refs/heads/develop'
     runs-on: ubuntu-latest
     env:
