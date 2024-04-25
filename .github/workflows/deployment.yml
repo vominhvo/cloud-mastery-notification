@@ -73,7 +73,6 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: Dockerfile
-          path: artifact
 
       - run: ls -la
       - run: ls artifact -la
@@ -98,4 +97,4 @@ jobs:
         with:
           push: true
           tags: ${{ env.ACR_SERVER }}/${{ env.APP_NAME }}:${{ steps.imageTagGeneration.outputs.version }}
-          context: 'artifact'
+          context: '.'
