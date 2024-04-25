@@ -76,7 +76,7 @@ jobs:
           path: artifact
 
       - run: ls -la
-      - run: cd artifact & ls -la
+      - run: ls artifact -la
 
       - name: Generate latest image tag
         id: imageTagGeneration
@@ -98,4 +98,4 @@ jobs:
         with:
           push: true
           tags: ${{ env.ACR_SERVER }}/${{ env.APP_NAME }}:${{ steps.imageTagGeneration.outputs.version }}
-          context: '/artifact'
+          context: 'artifact'
