@@ -15,7 +15,6 @@ on:
 env:
   ACR_SERVER: ${{ vars.ACR_SERVER }}
   APP_NAME: notification
-  NAMESPACE: cloud-mastery-notification
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -98,3 +97,36 @@ jobs:
           push: true
           tags: ${{ env.ACR_SERVER }}/${{ env.APP_NAME }}:${{ steps.imageTagGeneration.outputs.version }}
           context: '.'
+
+  deploy:
+    needs: push
+    if: github.ref == 'refs/heads/develop'
+    runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ needs.containerize.outputs.version }}
+      DEVOPS_REPO_NAME: cloud-mastery-devops
+      PIPELINE_USERNAME: pipeline
+      PIPELINE_EMAIL: vominhvo@gmail.com
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_TOKEN }}
+          repository: ${{ github.repository_owner }}/${{ env.DEVOPS_REPO_NAME }}
+          ref: ${{ github.ref_name }}
+      - name: Promote to AKS by update the image tag into chart values
+        id: promote-to-aks
+        run: |
+          echo Promote to AKS with the latest tag: $VERSION
+          echo "Updating image tag in the Chart values file: $APP_NAME-values.yaml"
+          sed -i "s,tag:.*,tag:\ $VERSION," helm-charts/cloud-mastery-app/values/$GITHUB_REF_NAME/$APP_NAME-values.yaml
+          # cat helm-charts/cloud-mastery-app/values/$GITHUB_REF_NAME/$APP_NAME-values.yaml
+          git config --global user.email $PIPELINE_EMAIL && git config --global user.name $PIPELINE_USERNAME
+          echo Check git status
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "There are changes -> Add & push the changes";
+            git add . && git commit -m "Update latest image tag: $VERSION"
+            git push
+          else
+            echo "No changes, the deployment progress stopped.";
+          fi
